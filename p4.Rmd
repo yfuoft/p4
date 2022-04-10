@@ -48,6 +48,9 @@ dataset = bind_rows(p1,p2,p3)
 View(dataset)
 ```
 
-## Selecting the variables
+### Selecting the variables
+In the interests of both time and readability, we will choose specific variables for the purposes of this paper. Furthermore, we will only take mainstream sources of all news media in account. These variables consist of "household_income" (measures gross household income), "primary_party" (records whether the respondent voter for the Republican Party, the Democratic Party, for neither or is unsure about it), "news_sources_facebook" (determines whether respondent got their news regarding politics from Facebook, a social media giant), "news_sources_cnn" (determines whether respondent got their news regarding politics from CNN), "news_sources_msnbc", "news_sources_fox" and "news_sources_newyorktimes" (the last three represent whether a respondent got their political news from MSNBC, Fox or the New York Times respectively.)
+
+### What the values in the dataset represent
 
 
