@@ -1,5 +1,5 @@
 ---
-title: "News Sources and Hopelessness: A Bipartisan Divide"
+title: "News Sources, Economic Status and Trust in Government: A Bipartisan Divide"
 author: "Yousuf Farhan"
 date: "4/3/2022"
 output: pdf_document
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(haven)
 library(readr)
 library(dplyr)
-
+library(ggplot2)
 ```
 
 ```{=tex}
@@ -24,33 +24,98 @@ Statisticians, political scientists, sociologists and economist have studied the
 # Introduction
 
 
-The R language [@R-base] is used, in addition to a variety of packages and scholarly sources. Please refer to the Bibliography section or the "references.bib" file in the Git repository for more information. The dataset from [@IIDEA2021] is used. The [@R-bibtex] package is used to assist in citing external resources.
+The R language [@R-base] is used, in addition to a variety of packages and scholarly sources. Please refer to the Bibliography section or the "references.bib" file in the Git repository for more information. The dataset from [@IIDEA2021] is used. The [@R-bibtex] package is used to assist in citing external resources. The relationship in question can be summarized as one between household income, federal political party affiliation, trust in government and society and source of political news. Further stratification based on age is done to observe whether socioeconomic status has changed among different age groups. This post-stratification was collected by [@IPUMS].
 
 
 
-# Data
+# Data before Stratification
 
 ## Obtaining the Data
 
-The [@IIDEA2021] dataset includes multiple compressed folders. All of them have been extract in the data subdirectory of the inputs folder. Within this, exists a folder for the data in the Stata file format, which further contains subdirectories which contain the data and relevant utility files for specific time periods, primarily divided into 3 phases. Each phase has subdirectories for various time periods. However, in the parent folder with the directories for all the phases, a directory which includes all the parallel studies exists. Only the parallel surveys will be used for the purposes of this paper since they were are conducted concurrently, so we can eliminate any speculation that can be attributed to differences regarding time-specific situations.
+The [@IIDEA2021] dataset includes multiple compressed folders. All of them have been extract in the data subdirectory of the inputs folder. Within this, exists a folder for the data in the Stata file format, which further contains subdirectories which contain the data and relevant utility files for specific time periods, primarily divided into 3 phases. Each phase has subdirectories for various time periods. However, in the parent folder with the directories for all the phases, a directory which includes all the parallel studies exists. Only the parallel surveys will be used for the purposes of this paper since they were are conducted concurrently, so we can eliminate any speculation that can be attributed to differences regarding time-specific situations. The [@R-ggplot2] is used for all graphing purposes.
 
 ## Preparing the Data
 
-The [@R-haven] package is used to read and parse these Stata files. Within the selected directory specified in the previous subsection, we individually select each parallel study, assigning them to a seperate variable 
-//check
-, and then merge them using [@R-dplyr] for cumulative results. The [@R-tidyverse] package is also extensively used for the purposes of data extraction, selection and manipulation.
+The [@R-haven] package is used to read and parse these Stata files. Within the selected directory specified in the previous subsection, we individually select each parallel study, assigning them to a seperate variable, and then merge them using [@R-dplyr] for cumulative results. The [@R-tidyverse] package is also extensively used for the purposes of data extraction, selection and manipulation.
 
 ```{r, echo=FALSE}
 p1 <- read_dta("inputs/data/Nationscape-Weekly-Materials-DTA-2021Dec/phase_parallel_v20210301/ns20210121_parallel/ns20210121_parallel.dta")
 p2 <- read_dta("inputs/data/Nationscape-Weekly-Materials-DTA-2021Dec/phase_parallel_v20210301/ns20200716_parallel/ns20200716_parallel.dta")
 p3 <- read_dta("inputs/data/Nationscape-Weekly-Materials-DTA-2021Dec/phase_parallel_v20210301/ns20210121_parallel/ns20210121_parallel.dta")
 dataset = bind_rows(p1,p2,p3)
-View(dataset)
 ```
 
 ### Selecting the variables
-In the interests of both time and readability, we will choose specific variables for the purposes of this paper. Furthermore, we will only take mainstream sources of all news media in account. These variables consist of "household_income" (measures gross household income), "primary_party" (records whether the respondent voter for the Republican Party, the Democratic Party, for neither or is unsure about it), "news_sources_facebook" (determines whether respondent got their news regarding politics from Facebook, a social media giant), "news_sources_cnn" (determines whether respondent got their news regarding politics from CNN), "news_sources_msnbc", "news_sources_fox" and "news_sources_newyorktimes" (the last three represent whether a respondent got their political news from MSNBC, Fox or the New York Times respectively.)
+In the interests of both time and readability, we will choose specific variables for the purposes of this paper. Furthermore, we will only take mainstream sources of all news media in account. These variables consist of "household_income" (measures gross household income), "primary_party" (records whether the respondent voter for the Republican Party, the Democratic Party, for neither or is unsure about it), "news_sources_facebook" (determines whether respondent got their news regarding politics from social media), "news_sources_cnn" (determines whether respondent got their news regarding politics from CNN), "news_sources_msnbc", "news_sources_fox" and "news_sources_newyorktimes" (the last three represent whether a respondent got their political news from MSNBC, Fox or the New York Times respectively.)
 
 ### What the values in the dataset represent
 
+The "household_income" variable measures gross incomes less than  \$14,999, which is represented by 1, all the way to \$250,000, which represented by 24. In between there are twenty-two income brackets, representing increments of \$5000 by integers in ascending order. The following image is taken from the survey's provided cookbook [@IIDEA2021]:
 
+![Household Income Ranges and their identifiers](img/household-income-ranges.png)
+
+Similarly, the variables representing federal political party affiliation and source of political news and their identifiers are shown by the following images from the same Cookbook:
+![Federal political party affiliation and their identifiers](img/political-party.png)
+![Social media as a news source](img/sm.png)
+![CNN as a news source](img/cnn.png)
+![MSNBC as a news source](img/msnbc.png)
+![Fox as a news source](img/fox.png)
+![The New York Times as a news source](img/nyt.png)
+
+
+
+## Exploring the Relationship between Party Affiliation and Source of News
+### Cumulative Analyses
+```{r, echo=FALSE}
+data <-
+  dataset %>%
+  select(
+    household_income,
+    primary_party,
+    right_track,
+    news_sources_facebook,
+    news_sources_cnn,
+    news_sources_cnn,
+    news_sources_msnbc,
+    news_sources_fox,
+    news_sources_new_york_times
+  )
+data <-
+  data %>%
+  mutate(primary_party = case_when(
+    primary_party == 1 ~ "Democrat",
+    primary_party == 2 ~ "Republican",
+    primary_party == 3 ~ "Neither",
+    primary_party == 999 ~ "Not Sure"
+    
+  ))
+data <-
+  data %>%
+  mutate(right_track = case_when(
+    right_track == 1 ~ "Yes",
+    right_track == 2 ~ "No",
+    right_track == 999 ~ "Not Sure"
+    
+  ))
+ggplot(data = data, aes(x = primary_party), fill = primary_party) +
+    geom_bar()+
+  ggtitle("Respondents' Cumulative Voting Results")
+ggplot(data = data, aes(x = right_track), fill = right_track) +
+    geom_bar()+
+  ggtitle("Respondents' opinions regarding whether the country is on the right track")
+
+
+```
+
+
+### Analyses Based on Party Affiliation
+```{r, echo=FALSE}
+repubs <- subset(data, primary_party == "Republican")
+ggplot(data = repubs, aes(x = right_track), ) +
+    geom_bar()+
+  ggtitle("Republican respondents' opinions regarding whether the country is on the right track")
+dems <- subset(data, primary_party == "Republican")
+ggplot(data = dems, aes(x = right_track), ) +
+    geom_bar()+
+  ggtitle("Republican respondents' opinions regarding whether the country is on the right track")
+```
