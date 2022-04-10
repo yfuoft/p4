@@ -17,7 +17,7 @@ library(ggplot2)
 ```{=tex}
 \begin{centering}
 {\bf Abstract}
-Statisticians, political scientists, sociologists and economist have studied the relationship between socioeconomic status and political leaning since these professions first began. This paper delves even deeper, and tries to show how socioeconomic status,political leaning and source of political and economic news influence the level of trust in both government and society.
+Statisticians, political scientists, sociologists and economist have studied the relationship between socioeconomic status and political leaning since these professions first began. This paper delves even deeper, and tries to show how socioeconomic status,political leaning and source of political and economic news influence the level of trust in both government and society. The results can be summarized in three sentences. Political party affiliation has little to no bearing in level of trust in government. The source of political news has a strong correlation with level of societal trust in government. And last but not least, the class divide no longer significantly influence political party affiliations.
 
 \end{centering}
 ```
@@ -53,6 +53,12 @@ In the interests of both time and readability, we will choose specific variables
 The "household_income" variable measures gross incomes less than  \$14,999, which is represented by 1, all the way to \$250,000, which represented by 24. In between there are twenty-two income brackets, representing increments of \$5000 by integers in ascending order. The following image is taken from the survey's provided cookbook [@IIDEA2021]:
 
 ![Household Income Ranges and their identifiers](img/household-income-ranges.png)
+
+We will merge multiple ranges for better readability. We define respondents with gross household incomes represented by the identifier 1 as "destitute", represented by the identifies 2 to 5 as "poor", 6 to 12 as "working", 13 to 19 as "middle", 20 to 23 as "upper" and 24 as "rich."
+
+```{r, echo=FALSE}
+
+```
 \newpage
 Similarly, the variables representing federal political party affiliation and source of political news and their identifiers are shown by the following images from the same Cookbook:
 ![Federal political party affiliation and their identifiers](img/political-party.png)
@@ -99,9 +105,12 @@ data <-
   ))
 ggplot(data = data, aes(x = primary_party), fill = primary_party) +
     geom_bar()+
+    xlab("Political party affiliations")+
+
   ggtitle("Respondents' Cumulative Voting Results")
 ggplot(data = data, aes(x = right_track), fill = right_track) +
     geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
   ggtitle("Respondents' opinions regarding whether the country is on the right track")
 
 
@@ -152,13 +161,89 @@ ggplot(data = nyt, aes(x = right_track), ) +
   xlab("Is the country generally headed on the right track?")+
   ggtitle("Repondents' that received political news from the New York Times.")
 ```
+
+### Analyses based on Gross Household Income
+
+```{r, echo=FALSE}
+hi <-
+  data %>%
+  mutate(household_income = case_when( 
+    household_income == 1 ~ "Destitute",
+    household_income >1 | household_income <=5 ~ "Poor",
+    household_income >5 | household_income <=12 ~ "Working",
+    household_income >12 | household_income <=19 ~ "Middle",
+    household_income >19 | household_income <=23 ~ "Upper",
+    household_income == 24 ~ "Rich"
+  ))
+
+poor <- subset(hi, household_income == "Poor")
+
+ggplot(data = poor, aes(x = primary_party), fill = primary_party) +
+    geom_bar()+
+  xlab("Political party affiliations")+
+  ggtitle("Poor respondents' Cumulative Voting Results")
+ggplot(data = poor, aes(x = right_track), fill = right_track) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Poor respondents' opinions regarding whether the country is on the right track")
+
+working <- subset(data, household_income >1 | household_income <=5 )
+
+ggplot(data = working, aes(x = primary_party), fill = primary_party) +
+    geom_bar()+
+  xlab("Political party affiliations")+
+  ggtitle("Working class respondents' Cumulative Voting Results")
+ggplot(data = working, aes(x = right_track), fill = right_track) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Working class respondents' opinions regarding whether the country is on the right track")
+
+middle <- subset(data, household_income >12 | household_income <=19)
+
+ggplot(data = middle, aes(x = primary_party), fill = primary_party) +
+    geom_bar()+
+  xlab("Political party affiliations")+
+  ggtitle("Middle class respondents' Cumulative Voting Results")
+ggplot(data = middle, aes(x = right_track), fill = right_track) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Middle class respondents' opinions regarding whether the country is on the right track")
+
+upper <- subset(data, household_income >19 | household_income <=23)
+
+ggplot(data = upper, aes(x = primary_party), fill = primary_party) +
+    geom_bar()+
+  xlab("Political party affiliations")+
+  ggtitle("Upper class respondents' Cumulative Voting Results")
+ggplot(data = upper, aes(x = right_track), fill = right_track) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Upper class respondents' opinions regarding whether the country is on the right track")
+
+rich <- subset(data, household_income == 24)
+ggplot(data = rich, aes(x = primary_party), fill = primary_party) +
+    geom_bar()+
+  xlab("Political party affiliations")+
+  ggtitle("Rich respondents' Cumulative Voting Results")
+ggplot(data = rich, aes(x = right_track), fill = right_track) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Rich respondents' opinions regarding whether the country is on the right track")
+```
+
 # Discussion
 
 ## Observable trends
+
+
 ### Party Affliation and Trust in Government
 The correlation between trust in government and America's future based on political party affiliation ranges from non-existent to negligible. This is a stark contrast with previous academic literature that has generally been able to establish a strong correlation between these variables [@keele_2005]. Further research should be done to explain this change.
+
+
 ### Source of Political News and Trust in Government
 
 There is great overall variation in the level of trust in government and source of political news, which is generally in line with academic literature on this topic [@Marcinkowski2018]. A very interesting finding of this paper is how respondents that get their news from news outlets leaning more towards either side of the political spectrum tend to have similar levels of trust in government, a recurring trend in political science literature [@yu_rodriguez_2021].
+
+### Socioeconomic status and Party Affiliation
 
 \newpage
