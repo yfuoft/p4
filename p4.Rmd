@@ -1,0 +1,53 @@
+---
+title: "News Sources and Hopelessness: A Bipartisan Divide"
+author: "Yousuf Farhan"
+date: "4/3/2022"
+output: pdf_document
+bibliography: references.bib 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(haven)
+library(readr)
+library(dplyr)
+
+```
+
+```{=tex}
+\begin{centering}
+{\bf Abstract}
+Statisticians, political scientists, sociologists and economist have studied the relationship between socioeconomic status and political leaning since these professions first began. This paper delves even deeper, and tries to show how socioeconomic status,political leaning and source of political and economic news influence the level of trust in both government and society.
+
+\end{centering}
+```
+# Introduction
+
+
+The R language [@R-base] is used, in addition to a variety of packages and scholarly sources. Please refer to the Bibliography section or the "references.bib" file in the Git repository for more information. The dataset from [@IIDEA2021] is used. The [@R-bibtex] package is used to assist in citing external resources.
+
+
+
+# Data
+
+## Obtaining the Data
+
+The [@IIDEA2021] dataset includes multiple compressed folders. All of them have been extract in the data subdirectory of the inputs folder. Within this, exists a folder for the data in the Stata file format, which further contains subdirectories which contain the data and relevant utility files for specific time periods, primarily divided into 3 phases. Each phase has subdirectories for various time periods. However, in the parent folder with the directories for all the phases, a directory which includes all the parallel studies exists. Only the parallel surveys will be used for the purposes of this paper since they were are conducted concurrently, so we can eliminate any speculation that can be attributed to differences regarding time-specific situations.
+
+## Preparing the Data
+
+The [@R-haven] package is used to read and parse these Stata files. Within the selected directory specified in the previous subsection, we individually select each parallel study, assigning them to a seperate variable 
+//check
+, and then merge them using [@R-dplyr] for cumulative results. The [@R-tidyverse] package is also extensively used for the purposes of data extraction, selection and manipulation.
+
+```{r, echo=FALSE}
+p1 <- read_dta("inputs/data/Nationscape-Weekly-Materials-DTA-2021Dec/phase_parallel_v20210301/ns20210121_parallel/ns20210121_parallel.dta")
+p2 <- read_dta("inputs/data/Nationscape-Weekly-Materials-DTA-2021Dec/phase_parallel_v20210301/ns20200716_parallel/ns20200716_parallel.dta")
+p3 <- read_dta("inputs/data/Nationscape-Weekly-Materials-DTA-2021Dec/phase_parallel_v20210301/ns20210121_parallel/ns20210121_parallel.dta")
+dataset = bind_rows(p1,p2,p3)
+View(dataset)
+```
+
+## Selecting the variables
+
+
