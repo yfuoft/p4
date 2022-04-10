@@ -53,7 +53,7 @@ In the interests of both time and readability, we will choose specific variables
 The "household_income" variable measures gross incomes less than  \$14,999, which is represented by 1, all the way to \$250,000, which represented by 24. In between there are twenty-two income brackets, representing increments of \$5000 by integers in ascending order. The following image is taken from the survey's provided cookbook [@IIDEA2021]:
 
 ![Household Income Ranges and their identifiers](img/household-income-ranges.png)
-
+\newpage
 Similarly, the variables representing federal political party affiliation and source of political news and their identifiers are shown by the following images from the same Cookbook:
 ![Federal political party affiliation and their identifiers](img/political-party.png)
 ![Social media as a news source](img/sm.png)
@@ -113,9 +113,50 @@ ggplot(data = data, aes(x = right_track), fill = right_track) +
 repubs <- subset(data, primary_party == "Republican")
 ggplot(data = repubs, aes(x = right_track), ) +
     geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
   ggtitle("Republican respondents' opinions regarding whether the country is on the right track")
 dems <- subset(data, primary_party == "Republican")
 ggplot(data = dems, aes(x = right_track), ) +
     geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
   ggtitle("Republican respondents' opinions regarding whether the country is on the right track")
+
 ```
+
+### Analyses Based on Source of Political News
+
+```{r, echo=FALSE}
+sm <- subset(data, news_sources_facebook == 1)
+ggplot(data = sm, aes(x = right_track), ) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Repondents' that received political news from social media.")
+cnn <- subset(data, news_sources_cnn == 1)
+ggplot(data = cnn, aes(x = right_track), ) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Repondents' that received political news from CNN.")
+msnbc <- subset(data, news_sources_facebook == 1)
+ggplot(data = msnbc, aes(x = right_track), ) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Repondents' that received political news from MSNBC.")
+fox <- subset(data, news_sources_facebook == 1)
+ggplot(data = fox, aes(x = right_track), ) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Repondents' that received political news from Fox.")
+nyt <- subset(data, news_sources_facebook == 1)
+ggplot(data = nyt, aes(x = right_track), ) +
+    geom_bar()+
+  xlab("Is the country generally headed on the right track?")+
+  ggtitle("Repondents' that received political news from the New York Times.")
+```
+# Discussion
+
+## Observable trends
+
+The correlation between trust in government and America's future based on political party affiliation ranges from non-existent to negligible. This is a stark contrast with previous academic literature that has generally been able to establish a strong correlation between these variables. Further research 
+
+
+\newpage
