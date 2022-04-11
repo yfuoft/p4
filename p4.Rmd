@@ -12,29 +12,28 @@ library(haven)
 library(readr)
 library(dplyr)
 library(ggplot2)
-ddi <- read_ipums_ddi("usa_00001.xml")
-ipums <- read_ipums_micro(ddi)
+#ipums <- read_sas("https://live.usa.datadownload.ipums.org/web/extracts/usa/1788691/usa_00001.sas")
 ```
 
 ```{=tex}
 \begin{centering}
 {\bf Abstract}
-Statisticians, political scientists, sociologists and economist have studied the relationship between socioeconomic status and political leaning since these professions first began. This paper delves even deeper, and tries to show how socioeconomic status,political leaning and source of political and economic news influence the level of trust in both government and society. The results can be summarized in three sentences. Political party affiliation has little to no bearing in level of trust in government. The source of political news has a strong correlation with level of societal trust in government. And last but not least, the class divide no longer significantly influence political party affiliations.
+Statisticians, political scientists, sociologists and economist have studied the relationship between socioeconomic status and political leaning since these professions first began. This paper delves even deeper, and tries to show how socioeconomic status,political leaning and source of political and economic news influence the level of trust in both government and society. The results can be summarized in three sentences. Political party affiliation has little to no bearing in level of trust in government. The source of political news has a strong correlation with level of societal trust in government. And last but not least, the class divide no longer significantly influences political party affiliations and a majority of respondents across all age groups believe that the country is not on the right track.
 
 \end{centering}
 ```
 # Introduction
 
 
-The R language [@R-base] is used, in addition to a variety of packages and scholarly sources. Please refer to the Bibliography section or the "references.bib" file in the Git repository for more information. The dataset from [@IIDEA2021] is used. The [@R-bibtex] package is used to assist in citing external resources. The relationship in question can be summarized as one between household income, federal political party affiliation, trust in government and society and source of political news. Further stratification based on age is done to observe whether socioeconomic status has changed among different age groups. This post-stratification was collected by [@IPUMS].
+The R language [@R-base] is used, in addition to a variety of packages and scholarly sources. Please refer to the Bibliography section or the "references.bib" file in the Git repository for more information. The dataset from [@IIDEA2021] is used. The [@R-bibtex] package is used to assist in citing external resources. The relationship in question can be summarized as one between household income, age, federal political party affiliation, trust in government and society and source of political news. Further stratification based on age is done to observe whether socioeconomic status has changed among different age groups. This post-stratification data  was collected by [@IPUMS].
 
 
 
-# Data before Stratification
+# Data 
 
 ## Obtaining the Data
 
-The [@IIDEA2021] dataset includes multiple compressed folders. All of them have been extract in the data subdirectory of the inputs folder. Within this, exists a folder for the data in the Stata file format, which further contains subdirectories which contain the data and relevant utility files for specific time periods, primarily divided into 3 phases. Each phase has subdirectories for various time periods. However, in the parent folder with the directories for all the phases, a directory which includes all the parallel studies exists. Only the parallel surveys will be used for the purposes of this paper since they were are conducted concurrently, so we can eliminate any speculation that can be attributed to differences regarding time-specific situations. The [@R-ggplot2] is used for all graphing purposes. The data from IPUMS [@IPUMS] is used to test whether age group and political party affliations have any linear relationship
+The [@IIDEA2021] dataset includes multiple compressed folders. All of them have been extract in the data subdirectory of the inputs folder. Within this, exists a folder for the data in the Stata file format, which further contains subdirectories which contain the data and relevant utility files for specific time periods, primarily divided into 3 phases. Each phase has subdirectories for various time periods. However, in the parent folder with the directories for all the phases, a directory which includes all the parallel studies exists. Only the parallel surveys will be used for the purposes of this paper since they were are conducted concurrently, so we can eliminate any speculation that can be attributed to differences regarding time-specific situations. The [@R-ggplot2] for creating all the bar graphs. The data from IPUMS [@IPUMS] is used to test whether age group and political party affliations have any linear relationship
 
 ## Preparing the Data
 
@@ -233,6 +232,24 @@ ggplot(data = rich, aes(x = right_track), fill = right_track) +
   ggtitle("Rich respondents' opinions regarding whether the country is on the right track")
 ```
 
+
+### Exploring Linear Relationships
+
+
+To determine whether a cumulative relationship exists between gross household income, party affliation and age with whether the respondent believes that the country is on the right track, lets attempt at creating a linear model.
+```{r,echo=FALSE}
+fit1 <- lm(dataset$primary_party + dataset$household_income + dataset$age ~ dataset$right_track)
+plot(fit1)
+```
+To delve further in the intricacies of how political news sources influence one another, here is an attempt at creating a linear model between respondents' likelihood of getting political news from social media and from other mainstream non-social media outlets.
+
+\newpage
+```{r,echo=FALSE}
+fit2 <- lm(dataset$news_sources_cnn + dataset$news_sources_msnbc + dataset$news_sources_fox + dataset$news_sources_new_york_times ~ dataset$news_sources_facebook)
+plot(fit2)
+```
+
+
 # Discussion
 
 ## Observable trends
@@ -254,6 +271,14 @@ Another interesting find which contradicts widely-cited studies [@cooper_1959] i
 ### Economic Status and Societal Trust in Government
 
 Every single economic class, defined by gross household income, both cumulatively and independently, have demonstrated that they believe that the country is not headed on the right track.
+
+### Age and Level of Trust in Government
+
+Data [@IIDEA2021] and [@IPUMS] show how a majority across all age groups believes that the country is not on the right track.
+
+### Does Social Media make other Mainstream News Outlets Irrelevant for Political News?
+
+Respondents that got political news from social media were less likely to get political news from non-social media sources.
 
 ## Further Research
 
